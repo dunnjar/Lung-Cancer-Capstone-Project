@@ -1,0 +1,81 @@
+---
+title: "Lung Cancer PCA"
+output: word_document
+date: "2024-10-08"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+lc <- read.csv("C:/Users/conma/Downloads/lung cancer dataset.csv", header=TRUE)
+attach(lc)
+head(lc)
+```
+
+```{r}
+lc[lc == "Yes"] <- 1
+lc[lc == "No"] <- 0
+lc[lc == "M"] <- 1
+lc[lc == "F"] <- 0
+lc[lc == "YES"] <- 1
+lc[lc == "NO"] <- 0
+
+lc <- as.data.frame(lapply(lc, as.numeric))
+
+head(lc)
+```
+
+```{r}
+cor(lc)
+```
+
+
+```{r}
+set.seed(12121) #I use this so that I get the same answer each time
+choose <- runif(dim(lc)[1],0,1)
+train.lc <- lc[which(choose >= 0.1),]
+test.lc <- lc[which(choose< 0.1),]
+
+cor(train.lc[c(1:15)])
+```
+
+```{r}
+library(factoextra)
+res.pca <- prcomp(train.lc[c(1:15)],scale=TRUE)
+
+res.var <- get_pca_var(res.pca)
+res.var$coord
+```
+
+```{r}
+eig.val <- get_eigenvalue(res.pca)
+eig.val
+```
+
+```{r}
+fviz_eig(res.pca) #Scree plot
+```
+
+```{r}
+
+library(corrplot)
+
+# Compute the correlation matrix
+cor_matrix <- cor(lc)
+
+# Visualize the correlation matrix
+corrplot(cor_matrix, method = "circle", type = "full", tl.cex = 0.6, number.cex = .5,
+         tl.col = "black", tl.srt = 45, 
+         addCoef.col = "black")
+```
+
+```{r}
+# Visualize using heatmap
+heatmap(cor_matrix, 
+        main = "Heatmap of Correlation Matrix", 
+        col = colorRampPalette(c("blue", "white", "red"))(200), 
+        Rowv = NA, Colv = NA)
+```
+
